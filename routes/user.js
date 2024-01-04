@@ -180,6 +180,29 @@ router.put('/api/notes/:id', auth, async(req, res)=>{
 	res.status(401).send(error);
 }
 
+//7. delete existing note by ID
+router.delete('/api/notes/:id', auth, async(req, res)=>{
+    try {
+	    const {user_id} = req.user;
+        const {note_id} = req.body;
+
+        const note = await Note.findOne({_id:note_id});
+        if(!note)
+            throw new Error(`Note ID not found`);
+        if(user_id!=note.owner_id)
+            throw new Error(`User is not logged in for this note_id`);
+
+        await Note.deleteOne({_id:note_id});
+        res.status(201).json({
+            success: true,
+            message: "Note deleted successfully"
+        });
+	    // userObj.notes.push(note);
+	    // userObj.save();
+} catch (error) {
+    console.log(error);
+	res.status(401).send(error);
+}
 
 
     
